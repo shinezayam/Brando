@@ -25,6 +25,25 @@ function generateId(): string {
   return `proj_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
+/** Projects made while signed out (or when Supabase failed) have non-UUID ids and live in localStorage. */
+const isLocalId = (id: string) => id.startsWith('proj_');
+
+function readLocalProjects(): BrandProject[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const data = localStorage.getItem('brando_projects');
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    console.error('Failed to load from storage:', e);
+    return [];
+  }
+}
+
+function writeLocalProjects(projects: BrandProject[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('brando_projects', JSON.stringify(projects.filter((p) => isLocalId(p.id))));
+}
+
 function createDemoProject(): BrandProject {
   return {
     id: 'demo',
@@ -93,7 +112,7 @@ export const useBrandStore = create<BrandStore>((set, get) => ({
 
   loadProjects: async () => {
     const { userId, isGuest } = get();
-    
+
     if (isGuest || !userId) {
       // Load from localStorage for guests
       if (typeof window === 'undefined') return;
@@ -111,6 +130,22 @@ export const useBrandStore = create<BrandStore>((set, get) => ({
 
     // Load from Supabase for authenticated users
     const supabase = createClient();
+    if (!supabase) {
+      console.warn('Supabase not configured, falling back to localStorage');
+      if (typeof window !== 'undefined') {
+        try {
+          const data = localStorage.getItem('brando_projects');
+          if (data) {
+            const projects = JSON.parse(data);
+            set({ projects });
+          }
+        } catch (e) {
+          console.error('Failed to load from storage:', e);
+        }
+      }
+      return;
+    }
+
     const { data, error } = await supabase
       .from('projects')
       .select('*')
@@ -122,12 +157,14 @@ export const useBrandStore = create<BrandStore>((set, get) => ({
       return;
     }
 
-    const projects = (data || []).map((p: any) => ({
+    const remote = (data || []).map((p: any) => ({
       ...p.data,
       id: p.id,
     }));
+    if (error) console.error('Failed to load projects from Supabase:', error);
 
-    set({ projects });
+    // keep projects that only exist locally so they never disappear after signing in
+    set({ projects: [...remote, ...readLocalProjects().filter((p) => isLocalId(p.id))] });
   },
 
   createProject: async (name, source, brief) => {
@@ -193,8 +230,16 @@ export const useBrandStore = create<BrandStore>((set, get) => ({
       .single();
 
     if (error) {
-      console.error('Failed to create project:', error);
-      return '';
+      // Supabase save failed (e.g. table missing): keep the project locally so work isn't lost
+      console.error('Failed to create project in Supabase, saving locally:', error);
+      const localId = generateId();
+      const localProject = { ...project, id: localId };
+      set((state) => ({
+        currentProject: localProject,
+        projects: [...state.projects, localProject],
+      }));
+      writeLocalProjects(get().projects);
+      return localId;
     }
 
     const newProject = { ...project, id: data.id };
@@ -223,12 +268,9 @@ export const useBrandStore = create<BrandStore>((set, get) => ({
       currentProject: currentProject?.id === id ? updatedProject : currentProject,
     }));
 
-    if (isGuest || !userId) {
+    if (isGuest || !userId || isLocalId(id)) {
       // Save to localStorage
-      if (typeof window !== 'undefined') {
-        const { projects } = get();
-        localStorage.setItem('brando_projects', JSON.stringify(projects));
-      }
+      writeLocalProjects(get().projects);
       return;
     }
 
@@ -252,11 +294,8 @@ export const useBrandStore = create<BrandStore>((set, get) => ({
       currentProject: state.currentProject?.id === id ? null : state.currentProject,
     }));
 
-    if (isGuest || !userId) {
-      if (typeof window !== 'undefined') {
-        const { projects } = get();
-        localStorage.setItem('brando_projects', JSON.stringify(projects));
-      }
+    if (isGuest || !userId || isLocalId(id)) {
+      writeLocalProjects(get().projects);
       return;
     }
 

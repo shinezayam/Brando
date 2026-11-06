@@ -78,7 +78,7 @@ function OnboardingContent() {
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!brief.brandName || !brief.industry) {
       alert('Brand name and industry are required');
       return;
@@ -117,7 +117,7 @@ function OnboardingContent() {
       deliverablePriorities: brief.deliverablePriorities,
     };
 
-    const projectId = createProject(brief.brandName, source, fullBrief);
+    const projectId = await createProject(brief.brandName, source, fullBrief);
     localStorage.removeItem('brando_onboarding_draft');
     router.push(`/studio/${projectId}`);
   };

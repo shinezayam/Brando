@@ -18,19 +18,20 @@ function StudioShell({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const pathname = usePathname();
   const projectId = params.projectId as string;
-  const { currentProject, setCurrentProject, loadProjects } = useBrandStore();
+  const { currentProject, projects, userId, setCurrentProject, loadProjects } = useBrandStore();
   const { locale, setLocale, t } = useI18n();
 
+  // reload when the signed-in user changes, so the list matches the account
   useEffect(() => {
     loadProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (projectId) {
       setCurrentProject(projectId);
     }
-  }, [projectId, setCurrentProject]);
+  }, [projectId, projects, setCurrentProject]);
 
   const navItems = [
     { href: `/studio/${projectId}`, label: 'Overview', icon: '🏠', exact: true },

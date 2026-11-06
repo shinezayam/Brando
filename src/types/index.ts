@@ -54,6 +54,8 @@ export type LogoVariant = {
   name: string;
   svg: string;
   isPrimary: boolean;
+  /** Editable layered design; absent on logos made by the old template editor. */
+  design?: import('@/lib/logo/types').LogoDesign;
 };
 
 export type BrandDNA = {
