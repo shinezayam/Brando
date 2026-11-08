@@ -83,9 +83,22 @@ function convertToDesign(
 ): LogoDesign {
   const font = selectFont(description);
   
-  // Extract inner SVG content (without the <svg> wrapper)
-  const innerMatch = item.symbol_svg.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
-  const innerContent = innerMatch ? innerMatch[1].trim() : item.symbol_svg;
+  // Extract inner SVG content (without the <svg> wrapper and defs)
+  let svgContent = item.symbol_svg;
+  
+  // Remove <svg> wrapper tags
+  svgContent = svgContent.replace(/<svg[^>]*>/g, '').replace(/<\/svg>/g, '');
+  
+  // Remove <defs> section (gradients, filters cause conflicts)
+  svgContent = svgContent.replace(/<defs>[\s\S]*?<\/defs>/g, '');
+  
+  // Remove clipPath references that won't work without defs
+  svgContent = svgContent.replace(/clip-path="url\([^)]*\)"/g, '');
+  svgContent = svgContent.replace(/filter="url\([^)]*\)"/g, '');
+  
+  // Remove url() references to gradients/filters
+  svgContent = svgContent.replace(/fill="url\([^)]*\)"/g, `fill="${colors.primary}"`);
+  svgContent = svgContent.replace(/stroke="url\([^)]*\)"/g, `stroke="${colors.primary}"`);
   
   return {
     version: 1,
@@ -103,7 +116,7 @@ function convertToDesign(
       scale: 1,
       color: colors.primary,
       accent: colors.accent,
-      customSvg: innerContent,
+      customSvg: svgContent.trim(),
     },
     word: {
       text: brandName,

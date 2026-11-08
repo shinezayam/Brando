@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const SYSTEM_PROMPT = `You are a professional logo designer. Generate SVG code for logos based on user descriptions.
+const SYSTEM_PROMPT = `You are a logo designer. Generate SVG code for logos.
 
 Rules:
-1. Create clean, professional, minimalist logos
-2. Use a 100x100 viewBox for the symbol/mark
-3. Use simple geometric shapes, paths, and basic SVG elements
-4. Limit to 2-3 colors maximum
-5. Make it scalable and readable at small sizes
-6. Avoid text in the symbol (we add the brand name separately)
-7. Return ONLY valid SVG code, no explanations
-8. The symbol should be centered in the 100x100 grid
+- 100x100 viewBox
+- Simple geometric shapes
+- 2-3 colors max
+- No text in symbol
+- Center the symbol
 
-Return your response as a JSON object with this exact structure:
-{
-  "symbol_svg": "<svg viewBox=\\"0 0 100 100\\">...</svg>",
-  "concept": "brief description of the design",
-  "style": "modern|minimal|bold|elegant|playful|tech|organic",
-  "suggested_layout": "horizontal|stacked|mark"
-}`;
+Return JSON: {"symbol_svg":"<svg>...</svg>","concept":"short description","style":"modern|minimal|bold|elegant|playful|tech|organic","suggested_layout":"horizontal|stacked|mark"}`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     const apiKey = process.env.QWEN_API_KEY;
     const baseUrl = process.env.QWEN_BASE_URL || 'https://tokenhub.mn/v1';
-    const model = process.env.QWEN_MODEL || 'qwen3.7-plus';
+    const model = process.env.QWEN_MODEL || 'qwen3.7-flash';
 
     if (!apiKey) {
       return NextResponse.json(
@@ -72,8 +63,10 @@ Return a JSON array with ${count} objects, each containing:
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
-        max_tokens: 2000,
+        max_tokens: 1500,
+        enable_thinking: false,
       }),
+      signal: AbortSignal.timeout(120000), // 2 minute timeout
     });
 
     if (!response.ok) {

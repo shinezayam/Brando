@@ -119,12 +119,8 @@ export async function renderLogo(design: LogoDesign, opts: RenderOptions = {}): 
         return `<path d="${lp.d}" fill="${ink}" transform="translate(${f(tx)} ${f(ty)}) scale(${f(s)})"/>${dot}`;
       }
       if (m.kind === 'custom' && m.customSvg) {
-        // AI-generated custom SVG: replace colors with the design's ink/accent
-        let svg = m.customSvg;
-        // Replace common color attributes with the design colors
-        svg = svg.replace(/fill="[^"]*"/g, `fill="${ink}"`);
-        svg = svg.replace(/stroke="[^"]*"/g, `stroke="${ink}"`);
-        return `<g transform="translate(0 0)">${svg}</g>`;
+        // AI-generated custom SVG - already cleaned on client side
+        return `<g>${m.customSvg}</g>`;
       }
       return drawMark(m, ink, acc);
     };
