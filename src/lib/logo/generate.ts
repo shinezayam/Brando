@@ -45,24 +45,24 @@ type Tag = 'nature' | 'tech' | 'food' | 'finance' | 'health' | 'craft' | 'outdoo
 const TAG_WORDS: Record<Exclude<Tag, 'generic'>, RegExp> = {
   nature: /organic|eco|green|farm|garden|flower|plant|tea|herb|natural|botanic|wellness|spa|ногоон|цэцэг|байгаль|ургамал|цай/i,
   tech: /software|saas|app\b|tech|digital|data|ai\b|cloud|cyber|startup|platform|program|it\b|технологи|програм|дижитал|апп/i,
-  food: /cafe|coffee|restaurant|bakery|food|kitchen|bar\b|drink|pizza|burger|catering|кофе|ресторан|хоол|нарийн боов|кафе/i,
+  food: /cafe|coffee|restaurant|bakery|food|kitchen|bar\b|drink|pizza|burger|catering|chef|cook|meal|dine|кофе|ресторан|хоол|нарийн боов|кафе|кейтеринг/i,
   finance: /financ|bank|invest|insur|account|law|legal|consult|capital|loan|санхүү|банк|хөрөнгө|хууль|зөвлөх/i,
   health: /health|medic|clinic|dental|pharma|care|fitness|yoga|therapy|эрүүл|эмнэлэг|эм\b|фитнес/i,
   craft: /furniture|wood|craft|handmade|handcraft|build|construct|interior|studio|workshop|тавилга|мод|гар утас|барилга|дотор/i,
   outdoor: /outdoor|travel|tour|mountain|adventure|camp|hike|sport|trek|аялал|уул|адал|спорт/i,
-  creative: /design|art|music|media|photo|film|fashion|gallery|creative|brand|дизайн|урлаг|хөгжим|загвар|зураг/i,
+  creative: /design|art|music|media|photo|film|cinema|movie|camera|fashion|gallery|creative|brand|дизайн|урлаг|хөгжим|загвар|зураг|кино|фильм|камер/i,
 };
 
 const TAG_MARKS: Record<Tag, MarkKind[]> = {
   nature: ['petals', 'leaf', 'sun', 'wave', 'orbit'],
   tech: ['orbit', 'cube', 'quad', 'chevrons', 'bars', 'ringcut'],
-  food: ['sun', 'leaf', 'petals', 'ringcut', 'wave'],
+  food: ['chefhat', 'forkplate', 'sun', 'leaf', 'petals'],
   finance: ['bars', 'chevrons', 'cube', 'quad', 'peak'],
   health: ['petals', 'orbit', 'ringcut', 'leaf', 'wave'],
   craft: ['peak', 'cube', 'quad', 'chevrons', 'leaf'],
   outdoor: ['peak', 'sun', 'wave', 'chevrons', 'orbit'],
-  creative: ['quad', 'orbit', 'petals', 'ringcut', 'wave', 'cube'],
-  generic: ['petals', 'orbit', 'bars', 'chevrons', 'cube', 'sun', 'leaf', 'peak', 'ringcut', 'quad', 'wave'],
+  creative: ['camera', 'clapper', 'filmreel', 'quad', 'orbit', 'petals'],
+  generic: ['petals', 'orbit', 'bars', 'chevrons', 'cube', 'sun', 'leaf', 'peak', 'ringcut', 'quad', 'wave', 'camera', 'clapper', 'filmreel', 'forkplate', 'chefhat'],
 };
 
 const TAG_COLOR: Record<Tag, string> = {

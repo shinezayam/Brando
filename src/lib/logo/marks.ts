@@ -237,6 +237,11 @@ const DRAWERS: Partial<Record<MarkKind, (s: MarkSpec, ink: string, acc: string) 
   ringcut,
   quad,
   wave,
+  camera,
+  clapper,
+  filmreel,
+  forkplate,
+  chefhat,
 };
 
 /** Inner markup of a mark on the 100x100 grid. Monogram and custom are handled by the renderer. */
@@ -244,6 +249,86 @@ export function drawMark(spec: MarkSpec, ink: string, accent: string): string {
   if (spec.kind === 'custom' || spec.kind === 'monogram') return '';
   const fn = DRAWERS[spec.kind];
   return fn ? fn(spec, ink, accent) : '';
+}
+
+// Industry-specific marks
+
+function camera(s: MarkSpec, ink: string, acc: string): string {
+  const attrs = paint(s, ink);
+  const sw = f(4.5 * s.thickness + 1);
+  // Camera body
+  const body = `<rect x="20" y="38" width="60" height="40" rx="${f(s.rounding * 8)}" ${attrs}/>`;
+  // Lens
+  const lens = `<circle cx="50" cy="58" r="12" fill="none" stroke="${acc}" stroke-width="${sw}"/>`;
+  const lensInner = `<circle cx="50" cy="58" r="5" ${attrs}/>`;
+  // Flash/viewfinder on top
+  const flash = `<path d="M35 38 L40 28 L60 28 L65 38" fill="none" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  return `<g transform="translate(0 0)">${body}${flash}${lens}${lensInner}</g>`;
+}
+
+function clapper(s: MarkSpec, ink: string, acc: string): string {
+  const attrs = paint(s, ink);
+  const sw = f(4.5 * s.thickness + 1);
+  // Board base
+  const board = `<rect x="18" y="40" width="64" height="42" rx="${f(s.rounding * 6)}" ${attrs}/>`;
+  // Clapper top (angled)
+  const clapperTop = `<path d="M18 40 L18 30 L82 20 L82 40" fill="${acc}" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  // Stripes on clapper
+  const stripes = `<line x1="30" y1="37" x2="35" y2="27" stroke="${ink}" stroke-width="${f(sw * 0.6)}"/>
+    <line x1="45" y1="35" x2="50" y2="25" stroke="${ink}" stroke-width="${f(sw * 0.6)}"/>
+    <line x1="60" y1="33" x2="65" y2="23" stroke="${ink}" stroke-width="${f(sw * 0.6)}"/>`;
+  return `<g transform="translate(0 0)">${board}${clapperTop}${stripes}</g>`;
+}
+
+function filmreel(s: MarkSpec, ink: string, acc: string): string {
+  const attrs = paint(s, ink);
+  const sw = f(4.5 * s.thickness + 1);
+  // Outer circle
+  const outer = `<circle cx="50" cy="50" r="40" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Inner circle
+  const inner = `<circle cx="50" cy="50" r="12" ${attrs}/>`;
+  // Spokes/holes
+  const n = clamp(Math.round(s.count), 3, 6);
+  let holes = '';
+  for (let i = 0; i < n; i++) {
+    const angle = rad(s.rotation + (i * 360) / n);
+    const x = 50 + 26 * Math.cos(angle);
+    const y = 50 + 26 * Math.sin(angle);
+    holes += `<circle cx="${f(x)}" cy="${f(y)}" r="6" fill="${acc}"/>`;
+  }
+  return `<g transform="translate(0 0)">${outer}${inner}${holes}</g>`;
+}
+
+function forkplate(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4.5 * s.thickness + 1);
+  // Plate (circle)
+  const plate = `<circle cx="50" cy="52" r="32" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Fork on left
+  const fork = `<g transform="translate(25 20)">
+    <line x1="0" y1="0" x2="0" y2="60" stroke="${acc}" stroke-width="${sw}" stroke-linecap="round"/>
+    <line x1="-6" y1="0" x2="-6" y2="18" stroke="${acc}" stroke-width="${f(sw * 0.7)}" stroke-linecap="round"/>
+    <line x1="6" y1="0" x2="6" y2="18" stroke="${acc}" stroke-width="${f(sw * 0.7)}" stroke-linecap="round"/>
+  </g>`;
+  // Knife on right
+  const knife = `<g transform="translate(75 20)">
+    <line x1="0" y1="0" x2="0" y2="60" stroke="${acc}" stroke-width="${sw}" stroke-linecap="round"/>
+    <path d="M0 0 Q8 15 0 30" fill="none" stroke="${acc}" stroke-width="${f(sw * 0.7)}"/>
+  </g>`;
+  return `<g transform="translate(0 0)">${plate}${fork}${knife}</g>`;
+}
+
+function chefhat(s: MarkSpec, ink: string, acc: string): string {
+  const attrs = paint(s, ink);
+  const sw = f(4.5 * s.thickness + 1);
+  // Hat base (band)
+  const band = `<rect x="25" y="60" width="50" height="18" rx="${f(s.rounding * 4)}" ${attrs}/>`;
+  // Hat puff (cloud shape)
+  const puff = `<path d="M25 60 Q25 35 35 30 Q40 20 50 20 Q60 20 65 30 Q75 35 75 60" fill="${acc}" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  // Pleats
+  const pleats = `<line x1="38" y1="60" x2="38" y2="38" stroke="${ink}" stroke-width="${f(sw * 0.4)}" opacity="0.5"/>
+    <line x1="50" y1="60" x2="50" y2="32" stroke="${ink}" stroke-width="${f(sw * 0.4)}" opacity="0.5"/>
+    <line x1="62" y1="60" x2="62" y2="38" stroke="${ink}" stroke-width="${f(sw * 0.4)}" opacity="0.5"/>`;
+  return `<g transform="translate(0 0)">${puff}${band}${pleats}</g>`;
 }
 
 export function containerPath(kind: ContainerKind, rounding: number): string {
@@ -278,5 +363,10 @@ export const MARK_KINDS: { kind: MarkKind; label: string }[] = [
   { kind: 'ringcut', label: 'Ring' },
   { kind: 'quad', label: 'Quad' },
   { kind: 'wave', label: 'Wave' },
+  { kind: 'camera', label: 'Camera' },
+  { kind: 'clapper', label: 'Clapper' },
+  { kind: 'filmreel', label: 'Film Reel' },
+  { kind: 'forkplate', label: 'Fork & Plate' },
+  { kind: 'chefhat', label: 'Chef Hat' },
   { kind: 'custom', label: 'AI Custom' },
 ];

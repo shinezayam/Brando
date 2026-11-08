@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBrandStore } from '@/store';
 import type { BrandDNA } from '@/types';
 import { generateBrandDNA } from '@/lib/dna-generator';
@@ -13,20 +13,60 @@ export default function DNAPage() {
   const [editingSection, setEditingSection] = useState<EditableSection | null>(null);
   const [editValue, setEditValue] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
+  const [useAI, setUseAI] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch('/api/dna/generate')
+      .then(r => r.json())
+      .then(data => setAiAvailable(data.configured))
+      .catch(() => setAiAvailable(false));
+  }, []);
 
   if (!currentProject) {
     return <div className="text-gray-500">Loading...</div>;
   }
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setIsGenerating(true);
-    // Simulate API delay
-    setTimeout(() => {
-      const generated = generateBrandDNA(currentProject.brief);
-      setLocalDNA(generated);
-      setDNA(generated);
-      setIsGenerating(false);
-    }, 800);
+    setError('');
+
+    if (useAI && aiAvailable) {
+      try {
+        const response = await fetch('/api/dna/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brief: currentProject.brief }),
+        });
+        const data = await response.json();
+        if (data.dna) {
+          setLocalDNA(data.dna);
+          setDNA(data.dna);
+        } else {
+          setError(data.error || 'AI generation failed');
+          // Fall back to deterministic
+          const generated = generateBrandDNA(currentProject.brief);
+          setLocalDNA(generated);
+          setDNA(generated);
+        }
+      } catch {
+        // Fall back to deterministic on error
+        const generated = generateBrandDNA(currentProject.brief);
+        setLocalDNA(generated);
+        setDNA(generated);
+      }
+    } else {
+      // Use deterministic generator
+      setTimeout(() => {
+        const generated = generateBrandDNA(currentProject.brief);
+        setLocalDNA(generated);
+        setDNA(generated);
+        setIsGenerating(false);
+      }, 500);
+      return;
+    }
+    setIsGenerating(false);
   };
 
   const handleRegenerateSection = (section: EditableSection) => {
@@ -78,6 +118,24 @@ export default function DNAPage() {
             Based on your brief, we&apos;ll generate your brand&apos;s mission, vision, values,
             voice traits, and messaging pillars. Everything is editable afterward.
           </p>
+          
+          {aiAvailable && (
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useAI}
+                  onChange={(e) => setUseAI(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                />
+                <span className="text-sm text-gray-700">
+                  <span className="font-medium">✨ AI-Powered</span>
+                  <span className="text-gray-500"> — intelligent, context-aware generation</span>
+                </span>
+              </label>
+            </div>
+          )}
+          
           <button
             onClick={handleGenerate}
             disabled={isGenerating}
@@ -89,14 +147,21 @@ export default function DNAPage() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Generating...
+                {useAI && aiAvailable ? 'AI is thinking...' : 'Generating...'}
               </span>
             ) : (
-              '✨ Generate Brand DNA'
+              `${useAI && aiAvailable ? '✨' : '💎'} Generate Brand DNA`
             )}
           </button>
+          
+          {error && (
+            <p className="text-xs text-amber-600 mt-3">{error} — using template instead.</p>
+          )}
+          
           <p className="text-xs text-gray-400 mt-4">
-            Uses deterministic generation. Connect Qwen API for AI-powered output.
+            {aiAvailable 
+              ? 'AI mode uses Qwen to generate authentic brand strategy from your brief.'
+              : 'Uses deterministic generation. Add QWEN_API_KEY for AI-powered output.'}
           </p>
         </div>
       </div>

@@ -15,6 +15,11 @@ export type MarkKind =
   | 'ringcut'
   | 'quad'
   | 'wave'
+  | 'camera'
+  | 'clapper'
+  | 'filmreel'
+  | 'forkplate'
+  | 'chefhat'
   | 'custom';
 
 export type ContainerKind = 'none' | 'circle' | 'square' | 'rounded' | 'hex' | 'shield';
