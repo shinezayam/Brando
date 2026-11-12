@@ -69,7 +69,7 @@ export default function Features() {
 
               {/* Highlights */}
               <div className="flex flex-wrap gap-2">
-                {feature.highlights.map((highlight) => (
+                {feature.highlights?.map((highlight) => (
                   <span
                     key={highlight}
                     className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full"
