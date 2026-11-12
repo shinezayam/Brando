@@ -237,11 +237,39 @@ const DRAWERS: Partial<Record<MarkKind, (s: MarkSpec, ink: string, acc: string) 
   ringcut,
   quad,
   wave,
+  // Industry-specific
   camera,
   clapper,
   filmreel,
   forkplate,
   chefhat,
+  circuit,
+  codebracket,
+  network,
+  medcross,
+  heartpulse,
+  dna,
+  chart,
+  shield,
+  coin,
+  book,
+  gradcap,
+  quill,
+  house,
+  key,
+  building,
+  dumbbell,
+  trophy,
+  scissors,
+  lipstick,
+  musicnote,
+  microphone,
+  compass,
+  airplane,
+  aperture,
+  columns,
+  scales,
+  pillar,
 };
 
 /** Inner markup of a mark on the 100x100 grid. Monogram and custom are handled by the renderer. */
@@ -331,6 +359,416 @@ function chefhat(s: MarkSpec, ink: string, acc: string): string {
   return `<g transform="translate(0 0)">${puff}${band}${pleats}</g>`;
 }
 
+// Tech marks
+function circuit(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4.5 * s.thickness + 1);
+  const r = f(s.rounding * 4);
+  // Central node
+  const center = `<circle cx="50" cy="50" r="8" ${paint(s, acc)}/>`;
+  // Circuit paths
+  const paths = `
+    <path d="M50 42 L50 20 L30 20" ${strokeAttrs(s, ink, sw)}/>
+    <path d="M58 50 L80 50 L80 30" ${strokeAttrs(s, ink, sw)}/>
+    <path d="M50 58 L50 80 L70 80" ${strokeAttrs(s, ink, sw)}/>
+    <path d="M42 50 L20 50 L20 70" ${strokeAttrs(s, ink, sw)}/>
+  `;
+  // End nodes
+  const nodes = `
+    <circle cx="30" cy="20" r="5" ${paint(s, ink)}/>
+    <circle cx="80" cy="30" r="5" ${paint(s, ink)}/>
+    <circle cx="70" cy="80" r="5" ${paint(s, ink)}/>
+    <circle cx="20" cy="70" r="5" ${paint(s, ink)}/>
+  `;
+  return `<g>${center}${paths}${nodes}</g>`;
+}
+
+function codebracket(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(6 * s.thickness + 2);
+  const r = f(s.rounding * 6);
+  // Left bracket <
+  const left = `<path d="M35 25 L15 50 L35 75" ${strokeAttrs(s, ink, sw)}/>`;
+  // Right bracket >
+  const right = `<path d="M65 25 L85 50 L65 75" ${strokeAttrs(s, acc, sw)}/>`;
+  // Slash /
+  const slash = `<line x1="55" y1="20" x2="45" y2="80" ${strokeAttrs(s, ink, f(sw * 0.7))}/>`;
+  return `<g>${left}${right}${slash}</g>`;
+}
+
+function network(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Central hub
+  const hub = `<circle cx="50" cy="50" r="10" ${paint(s, acc)}/>`;
+  // Outer nodes
+  const n = clamp(Math.round(s.count), 3, 6);
+  let nodes = '';
+  let lines = '';
+  for (let i = 0; i < n; i++) {
+    const angle = rad((i * 360) / n - 90);
+    const x = 50 + 35 * Math.cos(angle);
+    const y = 50 + 35 * Math.sin(angle);
+    lines += `<line x1="50" y1="50" x2="${f(x)}" y2="${f(y)}" ${strokeAttrs(s, ink, sw)}/>`;
+    nodes += `<circle cx="${f(x)}" cy="${f(y)}" r="7" ${paint(s, ink)}/>`;
+  }
+  return `<g>${lines}${hub}${nodes}</g>`;
+}
+
+// Health marks
+function medcross(s: MarkSpec, ink: string, acc: string): string {
+  const attrs = paint(s, ink);
+  const r = f(s.rounding * 6);
+  // Vertical bar
+  const v = `<rect x="40" y="15" width="20" height="70" rx="${r}" ${attrs}/>`;
+  // Horizontal bar
+  const h = `<rect x="15" y="40" width="70" height="20" rx="${r}" ${attrs}/>`;
+  return `<g>${v}${h}</g>`;
+}
+
+function heartpulse(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4 * s.thickness + 2);
+  // Heart shape
+  const heart = `<path d="M50 80 C20 60 10 40 20 25 C30 10 45 15 50 30 C55 15 70 10 80 25 C90 40 80 60 50 80Z" ${paint(s, ink)}/>`;
+  // Pulse line
+  const pulse = `<path d="M20 50 L35 50 L40 35 L50 65 L60 45 L65 50 L80 50" fill="none" stroke="${acc}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<g>${heart}${pulse}</g>`;
+}
+
+function dna(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3.5 * s.thickness + 1.5);
+  const n = clamp(Math.round(s.count), 3, 6);
+  let strands = '';
+  // Double helix
+  for (let i = 0; i <= 20; i++) {
+    const t = i / 20;
+    const y = 15 + t * 70;
+    const x1 = 50 + 20 * Math.sin(t * Math.PI * 2);
+    const x2 = 50 - 20 * Math.sin(t * Math.PI * 2);
+    if (i === 0) {
+      strands += `<path d="M${f(x1)} ${f(y)}`;
+    } else {
+      strands += ` L${f(x1)} ${f(y)}`;
+    }
+  }
+  strands += `" ${strokeAttrs(s, ink, sw)}/>`;
+  
+  let strands2 = '';
+  for (let i = 0; i <= 20; i++) {
+    const t = i / 20;
+    const y = 15 + t * 70;
+    const x2 = 50 - 20 * Math.sin(t * Math.PI * 2);
+    if (i === 0) {
+      strands2 += `<path d="M${f(x2)} ${f(y)}`;
+    } else {
+      strands2 += ` L${f(x2)} ${f(y)}`;
+    }
+  }
+  strands2 += `" ${strokeAttrs(s, acc, sw)}/>`;
+  
+  // Connecting bars
+  let bars = '';
+  for (let i = 0; i < n; i++) {
+    const t = (i + 0.5) / n;
+    const y = 15 + t * 70;
+    const x1 = 50 + 20 * Math.sin(t * Math.PI * 2);
+    const x2 = 50 - 20 * Math.sin(t * Math.PI * 2);
+    bars += `<line x1="${f(x1)}" y1="${f(y)}" x2="${f(x2)}" y2="${f(y)}" ${strokeAttrs(s, ink, f(sw * 0.6))}/>`;
+  }
+  
+  return `<g>${strands}${strands2}${bars}</g>`;
+}
+
+// Finance marks
+function chart(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4 * s.thickness + 1.5);
+  const n = clamp(Math.round(s.count), 3, 5);
+  let bars = '';
+  const barWidth = 60 / n;
+  for (let i = 0; i < n; i++) {
+    const h = 20 + (i / (n - 1)) * 50;
+    const x = 20 + i * barWidth;
+    const color = i === n - 1 ? acc : ink;
+    bars += `<rect x="${f(x)}" y="${f(85 - h)}" width="${f(barWidth * 0.7)}" height="${f(h)}" rx="${f(s.rounding * 3)}" ${paint(s, color)}/>`;
+  }
+  // Trend line
+  const trend = `<path d="M20 70 L40 55 L60 45 L80 25" fill="none" stroke="${acc}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  return `<g>${bars}${trend}</g>`;
+}
+
+function shield(s: MarkSpec, ink: string, acc: string): string {
+  const attrs = paint(s, ink);
+  const sw = f(3 * s.thickness + 1);
+  // Shield outline
+  const outline = `<path d="M50 10 L85 25 L85 55 C85 75 70 88 50 95 C30 88 15 75 15 55 L15 25 Z" ${attrs}/>`;
+  // Checkmark
+  const check = `<path d="M35 50 L45 62 L68 38" fill="none" stroke="${acc}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<g>${outline}${check}</g>`;
+}
+
+function coin(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4 * s.thickness + 1);
+  // Outer circle
+  const outer = `<circle cx="50" cy="50" r="38" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Inner circle
+  const inner = `<circle cx="50" cy="50" r="28" fill="none" stroke="${ink}" stroke-width="${f(sw * 0.6)}"/>`;
+  // Dollar sign or currency symbol
+  const symbol = `<text x="50" y="62" text-anchor="middle" font-size="32" font-weight="bold" fill="${acc}">$</text>`;
+  return `<g>${outer}${inner}${symbol}</g>`;
+}
+
+// Education marks
+function book(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3.5 * s.thickness + 1.5);
+  // Left page
+  const left = `<path d="M50 20 L50 80 L20 75 L20 15 Z" ${paint(s, ink)}/>`;
+  // Right page
+  const right = `<path d="M50 20 L50 80 L80 75 L80 15 Z" fill="${acc}" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  // Spine
+  const spine = `<line x1="50" y1="20" x2="50" y2="80" stroke="${ink}" stroke-width="${sw}"/>`;
+  return `<g>${left}${right}${spine}</g>`;
+}
+
+function gradcap(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Cap top (diamond)
+  const top = `<path d="M50 20 L85 35 L50 50 L15 35 Z" ${paint(s, ink)}/>`;
+  // Cap base
+  const base = `<path d="M25 40 L25 60 Q50 75 75 60 L75 40" fill="none" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  // Tassel
+  const tassel = `<line x1="75" y1="35" x2="85" y2="55" stroke="${acc}" stroke-width="${f(sw * 1.2)}" stroke-linecap="round"/>
+    <circle cx="85" cy="58" r="4" fill="${acc}"/>`;
+  return `<g>${top}${base}${tassel}</g>`;
+}
+
+function quill(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Feather body
+  const feather = `<path d="M70 15 Q50 30 40 50 Q35 65 30 80 L35 78 Q40 65 45 55 Q55 35 75 20 Z" ${paint(s, ink)}/>`;
+  // Quill tip
+  const tip = `<path d="M30 80 L25 90 L32 85 Z" fill="${acc}"/>`;
+  // Feather details
+  const details = `<path d="M55 30 Q45 40 40 50" fill="none" stroke="${acc}" stroke-width="${f(sw * 0.6)}"/>
+    <path d="M60 25 Q50 35 45 45" fill="none" stroke="${acc}" stroke-width="${f(sw * 0.6)}"/>`;
+  return `<g>${feather}${tip}${details}</g>`;
+}
+
+// Real Estate marks
+function house(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3.5 * s.thickness + 1.5);
+  // Roof
+  const roof = `<path d="M50 15 L85 45 L15 45 Z" ${paint(s, ink)}/>`;
+  // Walls
+  const walls = `<rect x="25" y="45" width="50" height="40" ${paint(s, acc !== ink ? acc : ink, acc !== ink ? 1 : 0.3)}/>`;
+  // Door
+  const door = `<rect x="42" y="60" width="16" height="25" rx="${f(s.rounding * 3)}" fill="${ink}"/>`;
+  return `<g>${roof}${walls}${door}</g>`;
+}
+
+function key(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4 * s.thickness + 1);
+  // Key head (circle)
+  const head = `<circle cx="30" cy="50" r="15" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Key shaft
+  const shaft = `<line x1="45" y1="50" x2="85" y2="50" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  // Key teeth
+  const teeth = `<line x1="70" y1="50" x2="70" y2="60" stroke="${acc}" stroke-width="${f(sw * 0.8)}" stroke-linecap="round"/>
+    <line x1="80" y1="50" x2="80" y2="58" stroke="${acc}" stroke-width="${f(sw * 0.8)}" stroke-linecap="round"/>`;
+  return `<g>${head}${shaft}${teeth}</g>`;
+}
+
+function building(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Main building
+  const main = `<rect x="25" y="30" width="50" height="55" ${paint(s, ink)}/>`;
+  // Windows
+  let windows = '';
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 3; col++) {
+      const x = 32 + col * 14;
+      const y = 38 + row * 15;
+      windows += `<rect x="${x}" y="${y}" width="8" height="10" fill="${acc}"/>`;
+    }
+  }
+  return `<g>${main}${windows}</g>`;
+}
+
+// Fitness marks
+function dumbbell(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4 * s.thickness + 1);
+  // Left weight
+  const left = `<rect x="15" y="35" width="15" height="30" rx="${f(s.rounding * 4)}" ${paint(s, ink)}/>`;
+  // Bar
+  const bar = `<rect x="30" y="45" width="40" height="10" ${paint(s, acc)}/>`;
+  // Right weight
+  const right = `<rect x="70" y="35" width="15" height="30" rx="${f(s.rounding * 4)}" ${paint(s, ink)}/>`;
+  return `<g>${left}${bar}${right}</g>`;
+}
+
+function trophy(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Cup
+  const cup = `<path d="M30 20 L70 20 L65 50 Q50 65 35 50 Z" ${paint(s, ink)}/>`;
+  // Handles
+  const handles = `<path d="M30 25 Q15 30 20 45 Q25 50 35 45" fill="none" stroke="${ink}" stroke-width="${sw}"/>
+    <path d="M70 25 Q85 30 80 45 Q75 50 65 45" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Base
+  const base = `<rect x="40" y="65" width="20" height="5" ${paint(s, acc)}/>`;
+  const stem = `<rect x="47" y="55" width="6" height="12" fill="${acc}"/>`;
+  return `<g>${cup}${handles}${stem}${base}</g>`;
+}
+
+// Beauty marks
+function scissors(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3.5 * s.thickness + 1.5);
+  // Left blade
+  const left = `<path d="M30 20 L50 50 L30 80" fill="none" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  // Right blade
+  const right = `<path d="M70 20 L50 50 L70 80" fill="none" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  // Handles
+  const handles = `<circle cx="30" cy="20" r="8" fill="none" stroke="${acc}" stroke-width="${f(sw * 0.8)}"/>
+    <circle cx="70" cy="20" r="8" fill="none" stroke="${acc}" stroke-width="${f(sw * 0.8)}"/>`;
+  // Pivot
+  const pivot = `<circle cx="50" cy="50" r="4" fill="${acc}"/>`;
+  return `<g>${left}${right}${handles}${pivot}</g>`;
+}
+
+function lipstick(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Tube body
+  const body = `<rect x="38" y="45" width="24" height="40" rx="${f(s.rounding * 3)}" ${paint(s, ink)}/>`;
+  // Cap
+  const cap = `<rect x="38" y="25" width="24" height="22" rx="${f(s.rounding * 3)}" fill="${acc}" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Lipstick tip
+  const tip = `<path d="M42 25 L50 10 L58 25 Z" fill="${acc}"/>`;
+  return `<g>${body}${cap}${tip}</g>`;
+}
+
+// Music marks
+function musicnote(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(4 * s.thickness + 1);
+  // Note head
+  const head = `<ellipse cx="35" cy="70" rx="12" ry="9" transform="rotate(-20 35 70)" ${paint(s, ink)}/>`;
+  // Stem
+  const stem = `<line x1="47" y1="68" x2="47" y2="20" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  // Flag
+  const flag = `<path d="M47 20 Q65 30 60 45" fill="none" stroke="${acc}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  return `<g>${head}${stem}${flag}</g>`;
+}
+
+function microphone(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3.5 * s.thickness + 1.5);
+  // Mic head
+  const head = `<ellipse cx="50" cy="35" rx="18" ry="22" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Grille lines
+  let grille = '';
+  for (let i = 0; i < 4; i++) {
+    const y = 25 + i * 7;
+    grille += `<line x1="38" y1="${y}" x2="62" y2="${y}" stroke="${acc}" stroke-width="${f(sw * 0.5)}"/>`;
+  }
+  // Stand
+  const stand = `<line x1="50" y1="57" x2="50" y2="85" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  const base = `<line x1="35" y1="85" x2="65" y2="85" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  return `<g>${head}${grille}${stand}${base}</g>`;
+}
+
+// Travel marks
+function compass(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Outer circle
+  const outer = `<circle cx="50" cy="50" r="38" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Compass needle
+  const needle = `<path d="M50 20 L55 50 L50 80 L45 50 Z" ${paint(s, acc)}/>`;
+  // Cardinal points
+  const points = `<text x="50" y="15" text-anchor="middle" font-size="10" font-weight="bold" fill="${ink}">N</text>
+    <text x="50" y="92" text-anchor="middle" font-size="10" font-weight="bold" fill="${ink}">S</text>
+    <text x="12" y="54" text-anchor="middle" font-size="10" font-weight="bold" fill="${ink}">W</text>
+    <text x="88" y="54" text-anchor="middle" font-size="10" font-weight="bold" fill="${ink}">E</text>`;
+  return `<g>${outer}${needle}${points}</g>`;
+}
+
+function airplane(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Fuselage
+  const body = `<path d="M20 50 L80 50 L85 48 L85 52 L80 50" ${paint(s, ink)}/>`;
+  // Wings
+  const wings = `<path d="M45 50 L35 30 L55 45 Z" fill="${acc}"/>
+    <path d="M45 50 L35 70 L55 55 Z" fill="${acc}"/>`;
+  // Tail
+  const tail = `<path d="M20 50 L15 40 L25 48 Z" fill="${ink}"/>`;
+  return `<g>${body}${wings}${tail}</g>`;
+}
+
+// Photography marks
+function aperture(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  const n = clamp(Math.round(s.count), 5, 8);
+  // Outer circle
+  const outer = `<circle cx="50" cy="50" r="40" fill="none" stroke="${ink}" stroke-width="${sw}"/>`;
+  // Aperture blades
+  let blades = '';
+  for (let i = 0; i < n; i++) {
+    const angle = rad((i * 360) / n);
+    const x1 = 50 + 15 * Math.cos(angle);
+    const y1 = 50 + 15 * Math.sin(angle);
+    const x2 = 50 + 35 * Math.cos(angle + 0.3);
+    const y2 = 50 + 35 * Math.sin(angle + 0.3);
+    blades += `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="${acc}" stroke-width="${f(sw * 0.8)}" stroke-linecap="round"/>`;
+  }
+  // Center
+  const center = `<circle cx="50" cy="50" r="8" fill="${acc}"/>`;
+  return `<g>${outer}${blades}${center}</g>`;
+}
+
+// Architecture marks
+function columns(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  const n = clamp(Math.round(s.count), 2, 4);
+  let cols = '';
+  const spacing = 60 / (n - 1 || 1);
+  for (let i = 0; i < n; i++) {
+    const x = 20 + i * spacing;
+    cols += `<rect x="${f(x - 4)}" y="30" width="8" height="50" ${paint(s, ink)}/>`;
+    // Capital
+    cols += `<rect x="${f(x - 6)}" y="25" width="12" height="5" rx="${f(s.rounding * 2)}" fill="${acc}"/>`;
+    // Base
+    cols += `<rect x="${f(x - 6)}" y="80" width="12" height="5" rx="${f(s.rounding * 2)}" fill="${acc}"/>`;
+  }
+  // Roof
+  const roof = `<path d="M15 25 L50 10 L85 25 Z" ${paint(s, ink)}/>`;
+  return `<g>${roof}${cols}</g>`;
+}
+
+// Legal marks
+function scales(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Central pillar
+  const pillar = `<line x1="50" y1="20" x2="50" y2="85" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  // Beam
+  const beam = `<line x1="20" y1="35" x2="80" y2="35" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>`;
+  // Left pan
+  const left = `<path d="M20 35 L15 55 L25 55 Z" fill="${acc}"/>`;
+  // Right pan
+  const right = `<path d="M80 35 L75 55 L85 55 Z" fill="${acc}"/>`;
+  // Base
+  const base = `<rect x="40" y="85" width="20" height="5" rx="${f(s.rounding * 2)}" fill="${ink}"/>`;
+  return `<g>${pillar}${beam}${left}${right}${base}</g>`;
+}
+
+function pillar(s: MarkSpec, ink: string, acc: string): string {
+  const sw = f(3 * s.thickness + 1);
+  // Main column
+  const column = `<rect x="40" y="25" width="20" height="60" ${paint(s, ink)}/>`;
+  // Capital (top)
+  const capital = `<rect x="35" y="18" width="30" height="7" rx="${f(s.rounding * 2)}" fill="${acc}"/>`;
+  // Base
+  const base = `<rect x="35" y="85" width="30" height="7" rx="${f(s.rounding * 2)}" fill="${acc}"/>`;
+  // Fluting details
+  let fluting = '';
+  for (let i = 0; i < 3; i++) {
+    const x = 45 + i * 5;
+    fluting += `<line x1="${x}" y1="30" x2="${x}" y2="80" stroke="${acc}" stroke-width="${f(sw * 0.3)}"/>`;
+  }
+  return `<g>${column}${capital}${base}${fluting}</g>`;
+}
+
 export function containerPath(kind: ContainerKind, rounding: number): string {
   switch (kind) {
     case 'circle':
@@ -363,10 +801,50 @@ export const MARK_KINDS: { kind: MarkKind; label: string }[] = [
   { kind: 'ringcut', label: 'Ring' },
   { kind: 'quad', label: 'Quad' },
   { kind: 'wave', label: 'Wave' },
+  // Creative/Media
   { kind: 'camera', label: 'Camera' },
   { kind: 'clapper', label: 'Clapper' },
   { kind: 'filmreel', label: 'Film Reel' },
+  { kind: 'musicnote', label: 'Music Note' },
+  { kind: 'microphone', label: 'Microphone' },
+  { kind: 'aperture', label: 'Aperture' },
+  // Food/Hospitality
   { kind: 'forkplate', label: 'Fork & Plate' },
   { kind: 'chefhat', label: 'Chef Hat' },
+  // Tech
+  { kind: 'circuit', label: 'Circuit' },
+  { kind: 'codebracket', label: 'Code' },
+  { kind: 'network', label: 'Network' },
+  // Health
+  { kind: 'medcross', label: 'Medical Cross' },
+  { kind: 'heartpulse', label: 'Heart Pulse' },
+  { kind: 'dna', label: 'DNA' },
+  // Finance
+  { kind: 'chart', label: 'Chart' },
+  { kind: 'shield', label: 'Shield' },
+  { kind: 'coin', label: 'Coin' },
+  // Education
+  { kind: 'book', label: 'Book' },
+  { kind: 'gradcap', label: 'Grad Cap' },
+  { kind: 'quill', label: 'Quill' },
+  // Real Estate
+  { kind: 'house', label: 'House' },
+  { kind: 'key', label: 'Key' },
+  { kind: 'building', label: 'Building' },
+  // Fitness/Sports
+  { kind: 'dumbbell', label: 'Dumbbell' },
+  { kind: 'trophy', label: 'Trophy' },
+  // Beauty/Fashion
+  { kind: 'scissors', label: 'Scissors' },
+  { kind: 'lipstick', label: 'Lipstick' },
+  // Travel
+  { kind: 'compass', label: 'Compass' },
+  { kind: 'airplane', label: 'Airplane' },
+  // Architecture
+  { kind: 'columns', label: 'Columns' },
+  // Legal
+  { kind: 'scales', label: 'Scales' },
+  { kind: 'pillar', label: 'Pillar' },
+  // AI-generated
   { kind: 'custom', label: 'AI Custom' },
 ];

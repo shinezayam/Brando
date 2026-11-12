@@ -40,29 +40,45 @@ const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, n));
 // ---------------------------------------------------------------------------
 // Reading the brief
 // ---------------------------------------------------------------------------
-type Tag = 'nature' | 'tech' | 'food' | 'finance' | 'health' | 'craft' | 'outdoor' | 'creative' | 'generic';
+type Tag = 'nature' | 'tech' | 'food' | 'finance' | 'health' | 'craft' | 'outdoor' | 'creative' | 'education' | 'realestate' | 'fitness' | 'beauty' | 'music' | 'travel' | 'architecture' | 'legal' | 'generic';
 
 const TAG_WORDS: Record<Exclude<Tag, 'generic'>, RegExp> = {
   nature: /organic|eco|green|farm|garden|flower|plant|tea|herb|natural|botanic|wellness|spa|ногоон|цэцэг|байгаль|ургамал|цай/i,
-  tech: /software|saas|app\b|tech|digital|data|ai\b|cloud|cyber|startup|platform|program|it\b|технологи|програм|дижитал|апп/i,
+  tech: /software|saas|app\b|tech|digital|data|ai\b|cloud|cyber|startup|platform|program|it\b|code|developer|api|технолог|програм|дижитал|апп/i,
   food: /cafe|coffee|restaurant|bakery|food|kitchen|bar\b|drink|pizza|burger|catering|chef|cook|meal|dine|кофе|ресторан|хоол|нарийн боов|кафе|кейтеринг/i,
-  finance: /financ|bank|invest|insur|account|law|legal|consult|capital|loan|санхүү|банк|хөрөнгө|хууль|зөвлөх/i,
-  health: /health|medic|clinic|dental|pharma|care|fitness|yoga|therapy|эрүүл|эмнэлэг|эм\b|фитнес/i,
+  finance: /financ|bank|invest|insur|account|capital|loan|trading|wealth|fund|санхүү|банк|хөрөнгө/i,
+  health: /health|medic|clinic|dental|pharma|care|fitness|yoga|therapy|hospital|wellness|bio|pharma|эрүүл|эмнэлэг|эм\b|фитнес/i,
   craft: /furniture|wood|craft|handmade|handcraft|build|construct|interior|studio|workshop|тавилга|мод|гар утас|барилга|дотор/i,
-  outdoor: /outdoor|travel|tour|mountain|adventure|camp|hike|sport|trek|аялал|уул|адал|спорт/i,
-  creative: /design|art|music|media|photo|film|cinema|movie|camera|fashion|gallery|creative|brand|дизайн|урлаг|хөгжим|загвар|зураг|кино|фильм|камер/i,
+  outdoor: /outdoor|travel|tour|mountain|adventure|camp|hike|sport|trek|expedition|аялал|уул|адал|спорт/i,
+  creative: /design|art|media|photo|film|cinema|movie|camera|fashion|gallery|creative|brand|дизайн|урлаг|зураг|кино|фильм|камер/i,
+  education: /education|school|university|college|academy|learn|teach|student|course|training|боловсрол|сургууль|их сургууль|академи|сургалт/i,
+  realestate: /real estate|property|housing|apartment|condo|realtor|broker|rental|lease|үл хөдлөх|өмч|байр|зуслан/i,
+  fitness: /gym|fitness|workout|exercise|training|athletic|sport|muscle|strength|conditioning|бэлтгэл|тамир|спорт/i,
+  beauty: /beauty|cosmetic|salon|spa|hair|nail|skincare|makeup|fashion|aesthetic|гоо сайхан|гоо бүтээгдэхүүн|үсчны газар/i,
+  music: /music|band|audio|sound|recording|studio|instrument|vocal|melody|rhythm|хөгжим|дуу|хоолой/i,
+  travel: /travel|tourism|tour|vacation|trip|journey|adventure|expedition|cruise|flight|аялал|жуулчин|аялагч/i,
+  architecture: /architecture|architect|building|construction|design|structure|blueprint|архитектур|барилга|барилгын/i,
+  legal: /law|legal|attorney|lawyer|justice|court|judicial|advocate|хууль|хуульч|өмгөөлөгч|шүүх/i,
 };
 
 const TAG_MARKS: Record<Tag, MarkKind[]> = {
   nature: ['petals', 'leaf', 'sun', 'wave', 'orbit'],
-  tech: ['orbit', 'cube', 'quad', 'chevrons', 'bars', 'ringcut'],
-  food: ['chefhat', 'forkplate', 'sun', 'leaf', 'petals'],
-  finance: ['bars', 'chevrons', 'cube', 'quad', 'peak'],
-  health: ['petals', 'orbit', 'ringcut', 'leaf', 'wave'],
+  tech: ['circuit', 'codebracket', 'network', 'cube', 'orbit', 'chevrons'],
+  food: ['forkplate', 'chefhat', 'sun', 'leaf', 'petals'],
+  finance: ['chart', 'shield', 'coin', 'bars', 'peak'],
+  health: ['medcross', 'heartpulse', 'dna', 'petals', 'orbit'],
   craft: ['peak', 'cube', 'quad', 'chevrons', 'leaf'],
-  outdoor: ['peak', 'sun', 'wave', 'chevrons', 'orbit'],
-  creative: ['camera', 'clapper', 'filmreel', 'quad', 'orbit', 'petals'],
-  generic: ['petals', 'orbit', 'bars', 'chevrons', 'cube', 'sun', 'leaf', 'peak', 'ringcut', 'quad', 'wave', 'camera', 'clapper', 'filmreel', 'forkplate', 'chefhat'],
+  outdoor: ['peak', 'sun', 'wave', 'compass', 'airplane'],
+  creative: ['camera', 'clapper', 'filmreel', 'aperture', 'musicnote', 'microphone'],
+  education: ['book', 'gradcap', 'quill', 'cube', 'sun'],
+  realestate: ['house', 'key', 'building', 'peak', 'shield'],
+  fitness: ['dumbbell', 'trophy', 'peak', 'sun', 'chevrons'],
+  beauty: ['scissors', 'lipstick', 'petals', 'leaf', 'ringcut'],
+  music: ['musicnote', 'microphone', 'wave', 'orbit', 'ringcut'],
+  travel: ['compass', 'airplane', 'peak', 'sun', 'wave'],
+  architecture: ['columns', 'building', 'cube', 'peak', 'shield'],
+  legal: ['scales', 'pillar', 'shield', 'book', 'peak'],
+  generic: ['petals', 'orbit', 'bars', 'chevrons', 'cube', 'sun', 'leaf', 'peak', 'ringcut', 'quad', 'wave'],
 };
 
 const TAG_COLOR: Record<Tag, string> = {
@@ -74,6 +90,14 @@ const TAG_COLOR: Record<Tag, string> = {
   craft: '#8a5a2b',
   outdoor: '#0f766e',
   creative: '#7c3aed',
+  education: '#4f46e5',
+  realestate: '#0891b2',
+  fitness: '#dc2626',
+  beauty: '#db2777',
+  music: '#9333ea',
+  travel: '#0284c7',
+  architecture: '#475569',
+  legal: '#1e293b',
   generic: '#0f172a',
 };
 

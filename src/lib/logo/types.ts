@@ -15,11 +15,52 @@ export type MarkKind =
   | 'ringcut'
   | 'quad'
   | 'wave'
+  // Industry-specific marks
   | 'camera'
   | 'clapper'
   | 'filmreel'
   | 'forkplate'
   | 'chefhat'
+  // Tech
+  | 'circuit'
+  | 'codebracket'
+  | 'network'
+  // Health
+  | 'medcross'
+  | 'heartpulse'
+  | 'dna'
+  // Finance
+  | 'chart'
+  | 'shield'
+  | 'coin'
+  // Education
+  | 'book'
+  | 'gradcap'
+  | 'quill'
+  // Real Estate
+  | 'house'
+  | 'key'
+  | 'building'
+  // Fitness
+  | 'dumbbell'
+  | 'trophy'
+  // Beauty
+  | 'scissors'
+  | 'lipstick'
+  // Music
+  | 'musicnote'
+  | 'microphone'
+  // Travel
+  | 'compass'
+  | 'airplane'
+  // Photography
+  | 'aperture'
+  // Architecture
+  | 'columns'
+  // Legal
+  | 'scales'
+  | 'pillar'
+  // AI-generated
   | 'custom';
 
 export type ContainerKind = 'none' | 'circle' | 'square' | 'rounded' | 'hex' | 'shield';
