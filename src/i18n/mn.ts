@@ -7,6 +7,9 @@ export const mn: Translation = {
     examples: 'Жишээ',
     faq: 'Асуулт хариулт',
     startCreating: 'Брэнд бүтээх',
+    myProjects: 'Миний төслүүд',
+    signIn: 'Нэвтрэх',
+    signOut: 'Гарах',
   },
   hero: {
     headline: 'Өөрийн гэсэн өнгө төрхтэй брэнд бүтээ.',
@@ -14,9 +17,15 @@ export const mn: Translation = {
     startScratch: 'Шинээр эхлэх',
     uploadLogo: 'Лого оруулах',
     importLink: 'Холбоос импортлох',
+    viewDemo: 'Демо үзэх →',
+    freeStart: 'Үнэгуй эхлэх',
+    noCreditCard: 'Карт шаардлагагүй',
+    exportAnytime: 'Хүссэн үедээ экспортол',
   },
   howItWorks: {
     title: 'Хэрхэн ажилладаг',
+    subtitle: 'Бүрэн брэндийн системтэй болох 4 энгийн алхам.',
+    fast: '10 минутанд брэндийн системээ бүтээ',
     steps: {
       brief: { title: 'Мэдээлэл', desc: 'Брэндийнхээ тухай асуултыг бөглөнө.' },
       generate: { title: 'Үүсгэх', desc: 'AI-аар лого, өнгө, фонт, брэндийн мөн чанарыг гаргана.' },
@@ -55,6 +64,20 @@ export const mn: Translation = {
   footer: {
     tagline: 'AI Брэндийн Студи',
     rights: '© 2026 Brando. Бүх эрх хуулиар хамгаалагдсан.',
+    cta: {
+      title: 'Брэндээ бүтээхэд бэлэн үү?',
+      subtitle: 'Brando ашиглан мянга мянган брэнд өөрсдийн таних тэмдгийг бүтээж байна.',
+    },
+    product: 'Бүтээгдэхүүн',
+    resources: 'Нөөц',
+    connect: 'Холбоо барих',
+    startFree: 'Үнэгүй эхлэх',
+    viewDemo: 'Демо үзэх',
+    contact: 'Холбоо барих',
+    privacy: 'Нууцлал',
+    terms: 'Нөхцөл',
+    madeWith: 'Хийсэн',
+    forCreators: 'бүтээгчдэд зориулж',
   },
   common: {
     language: 'Хэл',

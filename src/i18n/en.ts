@@ -5,6 +5,9 @@ export const en = {
     examples: 'Examples',
     faq: 'FAQ',
     startCreating: 'Start Creating',
+    myProjects: 'My Projects',
+    signIn: 'Sign In',
+    signOut: 'Sign Out',
   },
   hero: {
     headline: 'Build a brand that feels like yours.',
@@ -12,9 +15,15 @@ export const en = {
     startScratch: 'Start from scratch',
     uploadLogo: 'Upload a logo',
     importLink: 'Import a link',
+    viewDemo: 'View Demo →',
+    freeStart: 'Free to start',
+    noCreditCard: 'No credit card required',
+    exportAnytime: 'Export anytime',
   },
   howItWorks: {
     title: 'How it works',
+    subtitle: 'Four simple steps to your complete brand identity.',
+    fast: 'Complete your brand identity in under 10 minutes',
     steps: {
       brief: { title: 'Brief', desc: 'Tell us about your brand with a personalized discovery form.' },
       generate: { title: 'Generate', desc: 'Get AI-powered logo, colors, typography and brand DNA.' },
@@ -53,6 +62,20 @@ export const en = {
   footer: {
     tagline: 'AI Brand Identity Studio',
     rights: '© 2026 Brando. All rights reserved.',
+    cta: {
+      title: 'Ready to build your brand?',
+      subtitle: 'Join thousands of brands using Brando to create their identity.',
+    },
+    product: 'Product',
+    resources: 'Resources',
+    connect: 'Connect',
+    startFree: 'Start free',
+    viewDemo: 'View demo',
+    contact: 'Contact',
+    privacy: 'Privacy',
+    terms: 'Terms',
+    madeWith: 'Made with',
+    forCreators: 'for creators',
   },
   common: {
     language: 'Language',
