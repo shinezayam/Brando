@@ -534,7 +534,7 @@ export default function BrandbookPage() {
       </div>
 
       {/* Print styles */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           body {
             margin: 0;
@@ -548,7 +548,7 @@ export default function BrandbookPage() {
             size: A4;
           }
         }
-      `}</style>
+      `}} />
     </div>
   );
 }
